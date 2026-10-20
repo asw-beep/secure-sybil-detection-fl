@@ -1,0 +1,49 @@
+# Smoke test: default.yaml with fl.rounds = 3, for a quick end-to-end check before a full run.
+# Keep every other value identical to default.yaml (tests/test_config.py checks this).
+
+seed: 42
+
+data:
+  dataset: mnist
+  data_dir: data
+  num_clients: 20
+  partition: dirichlet
+  dirichlet_alpha: 0.5
+  min_client_samples: 50
+  max_partition_retries: 100
+  attacker_pool_size: 1000
+
+train:
+  batch_size: 32
+  lr: 0.05
+  momentum: 0.0
+  central_epochs: 2
+
+fl:
+  rounds: 3
+  local_epochs: 1
+
+attack:
+  type: none
+  num_sybils: 0
+  source_class: 7
+  target_class: 1
+  sybil_data: attacker_pool
+  samples_per_sybil: 500
+  evasion: none
+  evasion_budget: 0.0
+
+projection:
+  k: 64
+  generator: shake256
+
+defence:
+  aggregator: fedavg
+  detector: none
+  distance_threshold: 0.5
+  min_cluster_size: 3
+  fallback: skip
+
+evaluation:
+  shadow_ks: []
+  shadow_thresholds: []

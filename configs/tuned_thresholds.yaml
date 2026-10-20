@@ -1,0 +1,15 @@
+# Detector distance thresholds tuned on seed 0 only (experiments/tune_thresholds.py).
+# Rule: max F1 on the attacked run s.t. FPR <= 0.05 on the clean and attacked runs; ties -> larger tau.
+# Validation scores per variant are in the comments; full table: results/suite/tune/tuning_table.csv
+#   full: tau 0.25, feasible True, F1 1.000, FPR attack 0.000, FPR clean 0.000
+#   projected_k16: tau 0.12, feasible True, F1 1.000, FPR attack 0.000, FPR clean 0.000
+#   projected_k32: tau 0.2, feasible True, F1 1.000, FPR attack 0.000, FPR clean 0.000
+#   projected_k64: tau 0.15, feasible True, F1 1.000, FPR attack 0.000, FPR clean 0.000
+#   projected_k128: tau 0.2, feasible True, F1 1.000, FPR attack 0.000, FPR clean 0.000
+#   projected_k256: tau 0.2, feasible True, F1 1.000, FPR attack 0.000, FPR clean 0.000
+full: 0.25
+projected_k16: 0.12
+projected_k32: 0.2
+projected_k64: 0.15
+projected_k128: 0.2
+projected_k256: 0.2
