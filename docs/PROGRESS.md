@@ -372,6 +372,16 @@ new text files for 64-hex-character strings found only the two RFC 5869 PRK test
 `tests/test_crypto.py`.
 README and EXECUTION_PLAN status updated.
 
+## Step 9 — Live demo
+
+`demo.bat` runs `configs/demo_attack.yaml` and then `configs/demo_defended.yaml`. Both are
+`label_flip.yaml` cut to 5 rounds. The second also sets `detector: projected` and the tuned
+k = 64 threshold (0.15). The default 0.5 flagged 26–28 of 28 clients every round, so it is not
+used here. A new test pins both configs to `label_flip.yaml` and the defended threshold to
+`tuned_thresholds.yaml`. `pytest` → **167 passed**.
+Demo run: undefended, ASR 0.0058 → 0.0642 over rounds 1–5, final acc 0.9570. Defended: 8 flagged
+(tp 8, fp 0) in every round, ASR ≤ 0.0078, final acc 0.9701, ~5.7 s per round.
+
 ## What is left (for the author)
 
 Report and slides, written from `docs/RESULTS.md` (findings, limitations, figure index,

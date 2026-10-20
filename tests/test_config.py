@@ -93,6 +93,27 @@ def test_label_flip_config_differs_from_default_only_in_attack_section():
     assert flip == default
 
 
+def test_demo_configs_differ_from_label_flip_only_in_rounds_and_detector():
+    import yaml
+
+    flip = load_config(REPO / "configs" / "label_flip.yaml").to_dict()
+    attack = load_config(REPO / "configs" / "demo_attack.yaml").to_dict()
+    defended = load_config(REPO / "configs" / "demo_defended.yaml").to_dict()
+    assert attack["fl"]["rounds"] == 5
+    attack["fl"]["rounds"] = flip["fl"]["rounds"]
+    assert attack == flip
+
+    # The demo threshold must stay the tuned one for its k, or the detector flags almost everyone.
+    tuned = yaml.safe_load((REPO / "configs" / "tuned_thresholds.yaml").read_text())
+    k = defended["projection"]["k"]
+    assert defended["defence"]["detector"] == "projected"
+    assert defended["defence"]["distance_threshold"] == tuned[f"projected_k{k}"]
+    defended["defence"]["detector"] = "none"
+    defended["defence"]["distance_threshold"] = flip["defence"]["distance_threshold"]
+    defended["fl"]["rounds"] = flip["fl"]["rounds"]
+    assert defended == flip
+
+
 @pytest.mark.parametrize(
     "attack_yaml, message",
     [

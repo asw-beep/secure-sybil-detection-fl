@@ -1,0 +1,52 @@
+# Demo, run 1 of 2 (demo.bat): label_flip.yaml cut to fl.rounds = 5. The attack goes undefended.
+# Keep every other value identical to label_flip.yaml (tests/test_config.py checks this).
+
+seed: 42
+
+data:
+  dataset: mnist
+  data_dir: data
+  num_clients: 20
+  partition: dirichlet      # iid | dirichlet
+  dirichlet_alpha: 0.5      # smaller = more label skew (more non-IID)
+  min_client_samples: 50    # resample the Dirichlet split until every client has at least this many
+  max_partition_retries: 100
+  attacker_pool_size: 1000  # source-class (attack.source_class) images withheld from honest clients in
+                            # every run, clean too, so clean and attacked runs share honest clients (D9)
+
+train:
+  batch_size: 32
+  lr: 0.05
+  momentum: 0.0
+  central_epochs: 2         # used only by experiments/run_central.py (E0 sanity check)
+
+fl:
+  rounds: 5                 # every client takes part in every round
+  local_epochs: 1           # passes over a client's own data per round (fresh optimizer each round)
+
+attack:
+  type: label_flip
+  num_sybils: 8
+  source_class: 7           # label flipping: Sybils relabel their source-class samples as target;
+  target_class: 1           # ASR = fraction of source-class test images predicted as target (logged in clean runs too)
+  sybil_data: attacker_pool # attacker_pool: Sybils join as extra clients trained on pool samples (D9)
+                            # own_shard: num_sybils honest clients flip their own labels (Phase 3 baseline)
+  samples_per_sybil: 500    # attacker_pool only: images each Sybil draws from the pool
+  evasion: none             # E6 (D10): none | known_projection | guessed_projection | gaussian
+  evasion_budget: 0.0       # each Sybil's perturbation norm / its update norm
+
+projection:
+  k: 64                     # projected dimension (plan §4.2 candidates: 16 ... 512)
+  generator: shake256       # shake256: matrix signs from keyed SHAKE-256 (cryptographic, D3)
+                            # pcg64: same distribution from NumPy PCG64 (not cryptographic; cost comparison)
+
+defence:
+  aggregator: fedavg        # fedavg | median (coordinate-wise, unweighted)
+  detector: none            # none | full (full-dimensional counterpart) | projected (secret projection, D3)
+  distance_threshold: 0.5   # average-linkage cut on cosine distance; tuned on seed 0 (PROGRESS, step 4)
+  min_cluster_size: 3       # clusters with at least this many clients are flagged
+  fallback: skip            # every client flagged: keep the global model for that round
+
+evaluation:
+  shadow_ks: []             # shadow scoring of the projected detector at these k (full is always scored)
+  shadow_thresholds: []     # distance thresholds scored in shadow mode; both empty = off
