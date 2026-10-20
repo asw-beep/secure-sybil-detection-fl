@@ -165,7 +165,7 @@ pytest                                # full test suite
 - Test accuracy rises from about 0.10 to about **0.986** after 2 epochs.
 - It takes about 1–2 minutes.
 
-**Expected tests:** `166 passed`. Before MNIST is downloaded you will see `165 passed,
+**Expected tests:** `167 passed`. Before MNIST is downloaded you will see `166 passed,
 1 skipped`; the skipped test needs the real dataset.
 
 Quick end-to-end check (3 federated rounds, under a minute):
@@ -173,6 +173,19 @@ Quick end-to-end check (3 federated rounds, under a minute):
 ```bash
 python experiments/run_main.py --config configs/smoke.yaml
 ```
+
+Live demo (about 1–2 minutes): double-click `demo.bat`, or run the two configs yourself:
+
+```bash
+python experiments/run_main.py --config configs/demo_attack.yaml --out results/demo/attack
+python experiments/run_main.py --config configs/demo_defended.yaml --out results/demo/defended
+```
+
+Both runs use the label-flip attack (8 Sybils, 7 → 1) for 5 rounds. The first has no defence.
+The second uses the projected detector at k = 64 with its tuned threshold τ = 0.15. In our run
+the undefended ASR reached 0.064 by round 5. With the detector, every round flagged exactly
+the 8 Sybils (tp 8, fp 0), and ASR stayed at or below 0.008. Keep the threshold tuned: with
+the 0.5 from `label_flip.yaml`, the projected detector flags 26–28 of the 28 clients every round.
 
 ---
 
@@ -352,6 +365,7 @@ and are committed.
 
 ```
 configs/                default.yaml (every hyperparameter), smoke.yaml, label_flip.yaml,
+                        demo_attack.yaml, demo_defended.yaml (used by demo.bat),
                         tuned_thresholds.yaml (written by tune_thresholds.py)
 src/sybil_fl/
   config.py             typed YAML config; unknown keys are errors
@@ -370,11 +384,12 @@ src/sybil_fl/
   experiment.py         runs one experiment end to end and summarises it
 experiments/            run_central.py (E0), run_main.py (one run), run_suite.py (the study),
                         tune_thresholds.py, run_scalability.py (E5), summarize.py, make_plots.py
-tests/                  pytest suite (166 tests)
+tests/                  pytest suite (167 tests)
 docs/                   RESULTS.md, DECISIONS.md, PROGRESS.md, EXECUTION_PLAN.md
 results/summary/        generated result tables (committed)
 plots/                  generated figures (committed)
 setup_windows.bat       one-click Windows setup
+demo.bat                two-run live demo (attack undefended, then projected detector)
 ```
 
 ---
